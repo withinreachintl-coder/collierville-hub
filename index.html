@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collierville Operations Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    .hub-header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 2px solid #c8102e;
+      padding: 24px 32px;
+      text-align: center;
+    }
+
+    .hub-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .hub-logo-icon {
+      width: 60px;
+      height: 60px;
+      background: #c8102e;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
+
+    .hub-logo-icon span {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 40px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .hub-logo-brand {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #c8102e;
+      letter-spacing: 2px;
+    }
+
+    .hub-logo-tagline {
+      font-size: 11px;
+      color: #94a3b8;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .hub-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .hub-header p {
+      color: #94a3b8;
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    /* ── Navigation Grid ── */
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 0 24px;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-btn:hover { background: #334155; border-color: #c8102e; transform: translateY(-2px); }
+    .nav-btn.active { background: #c8102e; border-color: #c8102e; color: #fff; }
+
+    .nav-btn .icon { font-size: 20px; flex-shrink: 0; }
+
+    .nav-btn.external-link {
+      border-color: #475569;
+      background: #1a2236;
+    }
+    .nav-btn.external-link:hover {
+      border-color: #3b82f6;
+      background: #1e3a5f;
+    }
+
+    /* ── Section Panel ── */
+    .section-panel {
+      display: none;
+      max-width: 1100px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
+    }
+
+    .section-panel.visible { display: block; }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-container {
+      background: #1e293b;
+      border-radius: 8px;
+      height: 10px;
+      margin-bottom: 24px;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #c8102e, #ef4444);
+      border-radius: 8px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-text {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      text-align: right;
+    }
+
+    /* ── Checklist Cards ── */
+    .checklist-group {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .checklist-group-header {
+      background: #263044;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #c8102e;
+      border-bottom: 1px solid #334155;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 20px;
+      border-bottom: 1px solid #1a2332;
+      transition: background 0.15s;
+    }
+
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-item:hover { background: #263044; }
+
+    .checklist-item input[type="checkbox"] {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      border: 2px solid #475569;
+      border-radius: 5px;
+      background: transparent;
+      cursor: pointer;
+      margin-top: 1px;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .checklist-item input[type="checkbox"]:checked {
+      background: #c8102e;
+      border-color: #c8102e;
+    }
+
+    .checklist-item input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .checklist-item.checked label {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .checklist-item label {
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .checklist-item .assign-select {
+      margin-left: auto;
+      flex-shrink: 0;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      min-width: 90px;
+    }
+
+    .checklist-item .assign-select:focus {
+      outline: none;
+      border-color: #c8102e;
+    }
+
+    .checklist-item .assign-select option { background: #1e293b; }
+
+    .checklist-item .ee-badge {
+      flex-shrink: 0;
+      background: #334155;
+      color: #94a3b8;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* ── Prep / Grocery Table ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+
+    .data-table thead th {
+      background: #263044;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+      color: #c8102e;
+      border-bottom: 1px solid #334155;
+    }
+
+    .data-table tbody td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #1a2332;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    .data-table tbody tr:hover { background: #263044; }
+
+    .data-table input[type="text"],
+    .data-table input[type="number"] {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 5px;
+      width: 80px;
+      font-size: 13px;
+    }
+
+    .data-table input:focus {
+      outline: none;
+      border-color: #c8102e;
+    }
+
+    .prep-calc {
+      font-weight: 700;
+      color: #c8102e;
+      text-align: center;
+    }
+
+    .prep-calc.zero { color: #22c55e; }
+
+    .table-note {
+      background: #1a2236;
+      border-left: 3px solid #c8102e;
+      padding: 10px 16px;
+      margin-top: 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* ── Reset Button ── */
+    .reset-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s;
+    }
+
+    .reset-btn:hover { background: #b91c1c; }
+
+    .save-notice {
+      display: inline-block;
+      margin-left: 12px;
+      font-size: 12px;
+      color: #22c55e;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .save-notice.show { opacity: 1; }
+
+    .section-date {
+      font-size: 15px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      padding: 8px 14px;
+      background: #1a2236;
+      border-radius: 8px;
+      display: inline-block;
+      border: 1px solid #334155;
+    }
+
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: #16a34a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      margin-left: 10px;
+      transition: background 0.2s;
+    }
+
+    .submit-btn:hover { background: #15803d; }
+    .submit-btn:disabled { background: #475569; cursor: not-allowed; }
+
+    .submit-status {
+      display: inline-block;
+      margin-left: 12px;
+      font-size: 12px;
+      color: #22c55e;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .submit-status.show { opacity: 1; }
+    .submit-status.error { color: #ef4444; }
+
+    /* ── How-To Guide ── */
+    .guide-section {
+      line-height: 1.8;
+    }
+
+    .guide-section h3 {
+      color: #c8102e;
+      font-size: 18px;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .guide-section h3:first-child { margin-top: 0; }
+
+    .guide-section ol, .guide-section ul {
+      padding-left: 24px;
+      margin: 8px 0;
+    }
+
+    .guide-section li {
+      margin-bottom: 6px;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .guide-section strong { color: #fff; }
+
+    .guide-section .step-img {
+      background: #263044;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .guide-section .tip {
+      background: #1a2236;
+      border-left: 3px solid #3b82f6;
+      padding: 10px 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #94a3b8;
+      margin: 12px 0;
+    }
+
+    @media (max-width: 600px) {
+      .nav-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .hub-header h1 { font-size: 22px; }
+      .checklist-item { padding: 10px 14px; }
+      .data-table input { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hub-header">
+  <div class="hub-logo">
+    <div class="hub-logo-icon"><span>G</span></div>
+    <div class="hub-logo-brand">Guthrie's</div>
+    <div class="hub-logo-tagline">Golden Fried Chicken Fingers</div>
+  </div>
+  <h1>Collierville Operations Hub</h1>
+  <p>Daily Operations Management</p>
+</header>
+
+<!-- Navigation Buttons -->
+<nav class="nav-grid">
+  <button class="nav-btn" data-section="opening" onclick="showSection('opening', this)">
+    <span class="icon">&#9728;</span> Opening
+  </button>
+  <button class="nav-btn" data-section="closing" onclick="showSection('closing', this)">
+    <span class="icon">&#9790;</span> Closing
+  </button>
+  <button class="nav-btn" data-section="weekly" onclick="showSection('weekly', this)">
+    <span class="icon">&#128197;</span> Weekly Cleaning
+  </button>
+  <button class="nav-btn" data-section="prep" onclick="showSection('prep', this)">
+    <span class="icon">&#127860;</span> Prep Sheet
+  </button>
+  <button class="nav-btn" data-section="howto" onclick="showSection('howto', this)">
+    <span class="icon">&#128214;</span> How-To Guide
+  </button>
+  <a class="nav-btn external-link" href="https://guthries-operations-hub.vercel.app/" target="_blank">
+    <span class="icon">&#127968;</span> Guthries Ops Hub
+  </a>
+  <a class="nav-btn external-link" href="https://first-choice-hub.vercel.app/" target="_blank">
+    <span class="icon">&#128736;</span> First Choice Facilities
+  </a>
+</nav>
+
+<!-- ═══════════ OPENING ═══════════ -->
+<div id="section-opening" class="section-panel">
+  <h2 class="section-title">Opening Checklist</h2>
+  <div class="section-date" id="date-opening"></div>
+  <div class="section-subtitle">Guthrie's — complete all sections before and during shift</div>
+  <div class="progress-text" id="progress-text-opening">0 / 0 complete</div>
+  <div class="progress-bar-container"><div class="progress-bar" id="progress-opening"></div></div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Prior to Opening</div>
+    <div class="checklist-item"><input type="checkbox" id="o1"><label for="o1">Verify safe</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="o2"><label for="o2">Count all drawers - $200</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o3"><label for="o3">Check previous days daily sheet - text manager about any issue</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o4"><label for="o4">Turn on hood vents (most newer stores come on automatically)</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o5"><label for="o5">Turn on fryers - 350</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o6"><label for="o6">Turn on flat top - 400</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o7"><label for="o7">Turn on tea brewer</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o8"><label for="o8">Count fries and fingers</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o9"><label for="o9">Ensure music is playing</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o10"><label for="o10">Turn TV on (Sports only) - no volume</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o11"><label for="o11">Turn on menus</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o12"><label for="o12">Ensure lobby temperature is appropriate</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o13"><label for="o13">Melt butter (4 sticks - 5 ounces garlic salt)</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o14"><label for="o14">Get ice baths out - bring out lettuce, sauce bottle, chicken, and milkwash</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o15"><label for="o15">Scoop out breader for cart</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o16"><label for="o16">Get cold pans out - stock sauce and slaw</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o17"><label for="o17">Brew tea</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o18"><label for="o18">Put out patio umbrellas. Turn on signage if needed or if overcast</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o19"><label for="o19">Sweep parking lot and DT</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o20"><label for="o20">Change outside trash can</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o21"><label for="o21">Bring out lemons and ice down</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Before Lunch Rush</div>
+    <div class="checklist-item"><input type="checkbox" id="o22"><label for="o22">Check lobby for cleanliness</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="o23"><label for="o23">Check restrooms for cleanliness and everything stocked</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o24"><label for="o24">Check lobby for rush ready - napkins, straws, forks</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o25"><label for="o25">Check cashier alley for rush ready</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o26"><label for="o26">Check BOH for rush ready</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o27"><label for="o27">Run dish sinks and set out red buckets</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o28"><label for="o28">Check that giveaway stickers are available</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o29"><label for="o29">Clean filter machine to be ready after rush</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o30"><label for="o30">Look over prep and complete all needed daily prep</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">After Lunch Rush</div>
+    <div class="checklist-item"><input type="checkbox" id="o31"><label for="o31">Restock BOH - boxes, wax bags, buckets, lids, and fry boats</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="o32"><label for="o32">Restock Cashier Alley - ice, bags, straws, cups, lids, napkins, and forks</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o33"><label for="o33">Check restrooms for cleanliness and everything stocked</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o34"><label for="o34">Clean tables and booths</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o35"><label for="o35">Vacuum lobby</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o36"><label for="o36">Clean windows and doors</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o37"><label for="o37">Re-do all ice baths</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o38"><label for="o38">Change cold crocks and stock sauce and slaw</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o39"><label for="o39">Change ice for lemons</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o40"><label for="o40">Count down drawers</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o41"><label for="o41">Complete Daily Matrix Sheet</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o42"><label for="o42">Wash all dishes and change dish water</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o43"><label for="o43">Change all red buckets with fresh water</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o44"><label for="o44">Run trash</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o45"><label for="o45">Sweep parking lot</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o46"><label for="o46">Filter all fryers</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Before Leaving</div>
+    <div class="checklist-item"><input type="checkbox" id="o47"><label for="o47">No trash left to be ran</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="o48"><label for="o48">No dishes left to be washed</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o49"><label for="o49">Communicate to closing staff all daily notes</label></div>
+    <div class="checklist-item"><input type="checkbox" id="o50"><label for="o50">Let closing manager verify store before leaving</label></div>
+  </div>
+
+  <button class="reset-btn" onclick="resetSection('opening')">&#8635; Reset Opening Checklist</button>
+  <button class="submit-btn" onclick="submitToSheets('opening')">&#9989; Submit to Google Sheets</button>
+  <span class="save-notice" id="save-notice-opening">Saved</span>
+  <span class="submit-status" id="submit-status-opening"></span>
+</div>
+
+<!-- ═══════════ CLOSING ═══════════ -->
+<div id="section-closing" class="section-panel">
+  <h2 class="section-title">Closing Checklist</h2>
+  <div class="section-date" id="date-closing"></div>
+  <div class="section-subtitle">Guthrie's — every item must be completed before lockup</div>
+  <div class="progress-text" id="progress-text-closing">0 / 0 complete</div>
+  <div class="progress-bar-container"><div class="progress-bar" id="progress-closing"></div></div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Lobby</div>
+    <div class="checklist-item"><input type="checkbox" id="c1"><label for="c1">All tables, chairs, high chairs, and booths wiped down with sanitizer water</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="c2"><label for="c2">Restock all napkin dispensers. Make sure all tables have ketchup, tabasco, salt and pepper</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c3"><label for="c3">Restock condiment station</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c4"><label for="c4">Vacuum lobby - moving all booths. Mop tile area. Return rugs to correct location</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c5"><label for="c5">Spot clean all windows and doors. Wipe down all window seals</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c6"><label for="c6">Empty trash cans/outside trash included. Clean cabinet where trash can sits</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c7"><label for="c7">Wipe down counter top (windex)</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">BOH</div>
+    <div class="checklist-item"><input type="checkbox" id="c8"><label for="c8">Take all items off shelf over make table and slaw prep table and clean. Restock all products</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="c9"><label for="c9">Return all sauce/slaw to cooler. Wash cold pans - cold pans must be returned to freezer after washing</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c10"><label for="c10">Return lettuce and sauce bottle to cooler. Make sure both are refilled</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c11"><label for="c11">Wipe down all food prep areas</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c12"><label for="c12">Wash and return all tea brewing smallwares</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c13"><label for="c13">Empty cart and clean top and bottom</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c14"><label for="c14">Return clear lids to make table, and 1 black bus tub to cart</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c15"><label for="c15">Make all ice baths and put in freezer overnight</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c16"><label for="c16">Clean grill surface and sides. Once clean, empty grease catch pan</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c17"><label for="c17">Wipe down surface under flat top grill</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c18"><label for="c18">Return butter pan, grate, spatula, brush and both scrapers to grill</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c19"><label for="c19">Clean 1 hood vent, let air dry overnight</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c20"><label for="c20">Turn off all fryers and flat top</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c21"><label for="c21">Take back fryer pieces including hangers, wash and return</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c22"><label for="c22">Wipe down front of all fryers</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c23"><label for="c23">Restock gloves, paper towels, and sanitizer wipes</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c24"><label for="c24">Organize cooler and freezer - no empty fry boxes or sauce pans, everything put up correctly</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c25"><label for="c25">Empty all trash cans and run all trash - do not stack trash in front of dumpster if full</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c26"><label for="c26">Remove all dry dishes from drying shelf and stack on dry shelf</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c27"><label for="c27">Leave all wet dishes above the dish sinks to air dry overnight - including cleaning buckets</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c28"><label for="c28">Sweep and mop walk-in cooler floor</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c29"><label for="c29">Scrub all floors in BOH (including hallway and dish area)</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c30"><label for="c30">Take out all empty bread racks and restock</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c31"><label for="c31">Any opened bread loaves - tie up in Guthrie's t-sack bag</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c32"><label for="c32">Detail clean all hand sinks</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c33"><label for="c33">Scrub all 3 dish sinks like a dish and rinse after washing all dishes</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c34"><label for="c34">Wipe down bump bar using sanitizer towel</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c35"><label for="c35">Check BIB (Coke products) to ensure none are empty</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c36"><label for="c36">Filter all fryers</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Cashier Alley</div>
+    <div class="checklist-item"><input type="checkbox" id="c37"><label for="c37">Restock cups and lids</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="c38"><label for="c38">Restock straws and forks</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c39"><label for="c39">Restock bags</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c40"><label for="c40">Restock ice</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c41"><label for="c41">Restock ketchup, hot sauce, salt/pepper, and sweet n low in DT</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c42"><label for="c42">Wipe down counter and pass-through window (windex)</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c43"><label for="c43">Clean DT window and windows behind/around tea urns</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c44"><label for="c44">Soak coke nozzles for 5 minutes in sanitizer, clean with a rag, and return on the coke machines</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c45"><label for="c45">Return all washed tea urns and lids, re-assembled nozzles to cashier alley</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c46"><label for="c46">Return black tea urn tray and drip tray to cashier alley after washing</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c47"><label for="c47">Return lemon pans, lid, and tongs to cashier alley after washing</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c48"><label for="c48">Scrub cashier alley floor. Dry mop once squeegeed</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c49"><label for="c49">Return all headsets and make sure batteries are charging. Be sure all phones are on base</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c50"><label for="c50">Empty sanitizer bucket out and let air dry with dishes</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c51"><label for="c51">Restock paper towels</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c52"><label for="c52">Wipe down bump bar using sanitizer towel</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c53"><label for="c53">Turn off all TVs</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Restrooms</div>
+    <div class="checklist-item"><input type="checkbox" id="c54"><label for="c54">Mirrors and countertops cleaned free of spots and streaks</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="c55"><label for="c55">Check all products - toilet paper, soap, and paper towels</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c56"><label for="c56">Clean sink, toilets and urinals</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c57"><label for="c57">Scrub floors - around all sides of toilet</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c58"><label for="c58">Empty trash and put new bag in can</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Manager</div>
+    <div class="checklist-item"><input type="checkbox" id="c59"><label for="c59">Ensure all daily cleaning tasks are complete</label><span class="ee-badge">EE</span></div>
+    <div class="checklist-item"><input type="checkbox" id="c60"><label for="c60">Ensure you have personally checked every section in the restaurant</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c61"><label for="c61">End Day on register and do cash count down</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c62"><label for="c62">Complete Daily Sheet</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c63"><label for="c63">Ensure DT Window and Walk Up window is locked</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c64"><label for="c64">Ensure back door is closed</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c65"><label for="c65">Ensure lights off throughout restaurant</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c66"><label for="c66">Ensure DT neon lights are off</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c67"><label for="c67">Ensure all doors are closed and locked</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c68"><label for="c68">Ensure all money is locked in safe</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c69"><label for="c69">Ensure all daily cleaning tasks are complete</label></div>
+    <div class="checklist-item"><input type="checkbox" id="c70"><label for="c70">Complete Daily Matrix</label></div>
+  </div>
+
+  <button class="reset-btn" onclick="resetSection('closing')">&#8635; Reset Closing Checklist</button>
+  <button class="submit-btn" onclick="submitToSheets('closing')">&#9989; Submit to Google Sheets</button>
+  <span class="save-notice" id="save-notice-closing">Saved</span>
+  <span class="submit-status" id="submit-status-closing"></span>
+</div>
+
+<!-- ═══════════ WEEKLY CLEANING ═══════════ -->
+<div id="section-weekly" class="section-panel">
+  <h2 class="section-title">Weekly Cleaning Schedule</h2>
+  <div class="section-date" id="date-weekly"></div>
+  <div class="section-subtitle">Assign tasks to employees each day</div>
+  <div class="progress-text" id="progress-text-weekly">0 / 0 complete</div>
+  <div class="progress-bar-container"><div class="progress-bar" id="progress-weekly"></div></div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Monday</div>
+    <div class="checklist-item"><input type="checkbox" id="w1"><label for="w1">Wipe down all air vents in FOH</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w2"><label for="w2">Scrub floor under fryers and grill</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w3"><label for="w3">Detail clean wall behind fryers</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w4"><label for="w4">Detail clean baseboards in FOH</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Tuesday</div>
+    <div class="checklist-item"><input type="checkbox" id="w5"><label for="w5">Dust TVs</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w6"><label for="w6">Move all registers and wipe down underneath them</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w7"><label for="w7">Scrub (outside) back door area - traffic pattern buildup on concrete</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w8"><label for="w8">Detail clean baseboards in BOH</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w9"><label for="w9">Detail clean back door and kitchen door</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w10"><label for="w10">Detail lid holders at drink machines</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w11"><label for="w11">Detail clean the cup holder gaskets in the cashier alley and DT</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w12"><label for="w12">Break down all coke machines - wash all parts like a dish and flush pipe with clorox</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Wednesday</div>
+    <div class="checklist-item"><input type="checkbox" id="w13"><label for="w13">Detail clean outside menu board</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w14"><label for="w14">Scrub cooler floor</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w15"><label for="w15">Remove lids off Accent, Poultry seasoning, garlic salt, salt, and breader - wash like a dish</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w16"><label for="w16">Remove all products on chicken dunnage rack - detail clean rack</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w17"><label for="w17">Scrub bathroom floors. Clean all partitions and walls in restrooms</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Thursday</div>
+    <div class="checklist-item"><input type="checkbox" id="w18"><label for="w18">Wipe down all air vents in BOH</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w19"><label for="w19">Clean dust pans like a dish</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w20"><label for="w20">Detail clean filter machine</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w21"><label for="w21">Clean all walls in kitchen, hallway, and dish area</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Friday</div>
+    <div class="checklist-item"><input type="checkbox" id="w22"><label for="w22">Detail clean the front and the inside of all fryers (area where temperature dial is)</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w23"><label for="w23">Scrub all trash cans - inside and out</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w24"><label for="w24">Clean rails at bottom of prep table and make table</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w25"><label for="w25">Detail clean floor drains</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w26"><label for="w26">Detail clean drink employee drink holders</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Saturday</div>
+    <div class="checklist-item"><input type="checkbox" id="w27"><label for="w27">Scrub DT Window area (outside the wall and pavement/concrete)</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w28"><label for="w28">Clean the outside sides of fryers and grill</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w29"><label for="w29">Detail clean all product racks in dry storage, freezer, and cooler (shelves, dunnage racks, wall mount shelves)</label></div>
+  </div>
+
+  <div class="checklist-group">
+    <div class="checklist-group-header">Sunday</div>
+    <div class="checklist-item"><input type="checkbox" id="w30"><label for="w30">Scrub front door entrance (inside and out)</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w31"><label for="w31">Remove all product under counter (FOH and DT) and clean cabinet area</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w32"><label for="w32">Clean ice machine vents</label></div>
+    <div class="checklist-item"><input type="checkbox" id="w33"><label for="w33">Detail clean all door thresholds - the metal plate when you open door</label></div>
+  </div>
+
+  <button class="reset-btn" onclick="resetSection('weekly')">&#8635; Reset Weekly Checklist</button>
+  <button class="submit-btn" onclick="submitToSheets('weekly')">&#9989; Submit to Google Sheets</button>
+  <span class="save-notice" id="save-notice-weekly">Saved</span>
+  <span class="submit-status" id="submit-status-weekly"></span>
+</div>
+
+<!-- ═══════════ PREP SHEET ═══════════ -->
+<div id="section-prep" class="section-panel">
+  <h2 class="section-title">Prep Sheet</h2>
+  <div class="section-date" id="date-prep"></div>
+  <div class="section-subtitle">Track par levels, on hand, and prep needs</div>
+
+  <table class="data-table" id="prep-table">
+    <thead>
+      <tr><th>Item</th><th>Par</th><th>On Hand</th><th>Prep</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Guthrie's Sauce</td><td data-par="6">6</td><td><input type="text" data-key="prep-hand-0"></td><td class="prep-calc" id="prep-calc-0">—</td></tr>
+      <tr><td>Honey Mustard</td><td data-par="3">3</td><td><input type="text" data-key="prep-hand-1"></td><td class="prep-calc" id="prep-calc-1">—</td></tr>
+      <tr><td>Ranch</td><td data-par="3">3</td><td><input type="text" data-key="prep-hand-2"></td><td class="prep-calc" id="prep-calc-2">—</td></tr>
+      <tr><td>Buffalo</td><td data-par="3">3</td><td><input type="text" data-key="prep-hand-3"></td><td class="prep-calc" id="prep-calc-3">—</td></tr>
+      <tr><td>BBQ</td><td data-par="3">3</td><td><input type="text" data-key="prep-hand-4"></td><td class="prep-calc" id="prep-calc-4">—</td></tr>
+      <tr><td>Milkwash</td><td data-par="2">2</td><td><input type="text" data-key="prep-hand-5"></td><td class="prep-calc" id="prep-calc-5">—</td></tr>
+      <tr><td>Lettuce</td><td data-par="2">2</td><td><input type="text" data-key="prep-hand-6"></td><td class="prep-calc" id="prep-calc-6">—</td></tr>
+      <tr><td>Coleslaw</td><td data-par="5">5</td><td><input type="text" data-key="prep-hand-7"></td><td class="prep-calc" id="prep-calc-7">—</td></tr>
+      <tr><td>Lemons</td><td data-par="2">2</td><td><input type="text" data-key="prep-hand-8"></td><td class="prep-calc" id="prep-calc-8">—</td></tr>
+      <tr><td>Flour</td><td data-par="1">1</td><td><input type="text" data-key="prep-hand-9"></td><td class="prep-calc" id="prep-calc-9">—</td></tr>
+      <tr><td>Gallon Tea</td><td data-par="6">6</td><td><input type="text" data-key="prep-hand-10"></td><td class="prep-calc" id="prep-calc-10">—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="table-note">
+    <strong>Notes:</strong><br>
+    &bull; Fingers are prepped as soon as they come off truck<br>
+    &bull; Shred cabbage when you get down to 3 pans of slaw; be sure we have a 1/3 pan full of shredded carrots and purple cabbage at time of shredding<br>
+    &bull; Hand chop purple cabbage — do not rinse off purple or green cabbage before chopping/shredding
+  </div>
+
+  <button class="reset-btn" onclick="resetSection('prep')">&#8635; Reset Prep Sheet</button>
+  <button class="submit-btn" onclick="submitToSheets('prep')">&#9989; Submit to Google Sheets</button>
+  <span class="save-notice" id="save-notice-prep">Saved</span>
+  <span class="submit-status" id="submit-status-prep"></span>
+</div>
+
+<!-- ═══════════ HOW-TO GUIDE ═══════════ -->
+<div id="section-howto" class="section-panel">
+  <h2 class="section-title">How-To Guide</h2>
+  <div class="section-subtitle">Everything you need to know about using the Collierville Operations Hub</div>
+
+  <div class="guide-section">
+
+    <h3>Add to Your Phone (Home Screen App)</h3>
+    <p style="color:#cbd5e1; font-size:14px; margin-bottom:12px;">You can add the Collierville Operations Hub to your phone's home screen so it opens like a regular app — no app store needed.</p>
+
+    <strong style="color:#fff;">iPhone (Safari)</strong>
+    <ol>
+      <li>Open the hub URL in <strong>Safari</strong> (this does NOT work in Chrome on iPhone)</li>
+      <li>Tap the <strong>Share button</strong> at the bottom of the screen (the square with an arrow pointing up)</li>
+      <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+      <li>Name it <strong>"Collierville Hub"</strong> (or whatever you prefer)</li>
+      <li>Tap <strong>Add</strong> in the top right</li>
+      <li>The app icon will now appear on your home screen — tap it to open the hub full-screen like a real app</li>
+    </ol>
+
+    <div class="tip"><strong>Note:</strong> You MUST use Safari on iPhone. The "Add to Home Screen" option does not appear in Chrome, Firefox, or other browsers on iOS.</div>
+
+    <strong style="color:#fff;">Android (Chrome)</strong>
+    <ol>
+      <li>Open the hub URL in <strong>Chrome</strong></li>
+      <li>Tap the <strong>three-dot menu</strong> (&#8942;) in the top right corner</li>
+      <li>Tap <strong>"Add to Home screen"</strong> (or "Install app" if it appears)</li>
+      <li>Name it <strong>"Collierville Hub"</strong></li>
+      <li>Tap <strong>Add</strong></li>
+      <li>You may get a popup asking to add — tap <strong>"Add"</strong> again to confirm</li>
+      <li>The app icon will now appear on your home screen</li>
+    </ol>
+
+    <div class="tip"><strong>Tip:</strong> Once added to your home screen, the hub opens in full-screen mode without the browser address bar, so it looks and feels like a native app.</div>
+
+    <h3>Using the Checklists (Opening, Closing, Weekly)</h3>
+    <ol>
+      <li>Click the <strong>Opening</strong>, <strong>Closing</strong>, or <strong>Weekly Cleaning</strong> button at the top to open that checklist.</li>
+      <li>As each task is completed, <strong>check the box</strong> next to it. The task will get a strikethrough to show it's done.</li>
+      <li>Select the <strong>name of the person who completed it</strong> from the "Done by" dropdown on the right side of each task.</li>
+      <li>The <strong>progress bar</strong> at the top shows how many tasks are done out of the total.</li>
+      <li>Your progress <strong>auto-saves</strong> in the browser — you can close the page and come back without losing anything.</li>
+      <li>When the shift is over, click <strong>"Submit to Google Sheets"</strong> to log the day's completion to the Google Sheet.</li>
+      <li>Click <strong>"Reset"</strong> to clear all checkboxes and dropdowns for the next day/shift.</li>
+    </ol>
+
+    <div class="tip"><strong>Tip:</strong> Always submit to Google Sheets BEFORE resetting, so the day's work is recorded.</div>
+
+    <h3>Using the Prep Sheet</h3>
+    <ol>
+      <li>Click <strong>Prep Sheet</strong> from the top menu.</li>
+      <li>The <strong>Par</strong> column shows how many of each item you should have.</li>
+      <li>Type the current count into the <strong>On Hand</strong> column.</li>
+      <li>The <strong>Prep</strong> column auto-calculates how many you need to make (Par minus On Hand).</li>
+      <li>A <strong>green 0</strong> means you're at par — no prep needed for that item.</li>
+      <li>A <strong>red number</strong> means you need to prep that many.</li>
+      <li>Click <strong>"Submit to Google Sheets"</strong> to log the prep data for the day.</li>
+    </ol>
+
+    <div class="tip"><strong>Remember:</strong> Fingers are prepped as soon as they come off the truck. Shred cabbage when you get down to 3 pans of slaw.</div>
+
+    <h3>Google Sheets Setup (One-Time)</h3>
+    <ol>
+      <li>Create a new Google Sheet and name it <strong>"Collierville Operations Log"</strong></li>
+      <li>Click <strong>Extensions</strong> in the top menu bar, then click <strong>Apps Script</strong></li>
+      <li>You'll see a code editor. <strong>Delete everything</strong> in it</li>
+      <li>Open the file <strong>google-apps-script.js</strong> from the project folder, copy all the code, and paste it into the Apps Script editor</li>
+      <li>Look at the toolbar — next to the <strong>Run button</strong> (the play/triangle icon ▶), there is a <strong>dropdown</strong> that says a function name. Click that dropdown and select <strong>setupSheets</strong></li>
+    </ol>
+    <div class="step-img">
+      Toolbar looks like: &nbsp; [ ▶ Run ] &nbsp; [ Debug ] &nbsp; [ setupSheets ▼ ]<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&uarr; click this dropdown
+    </div>
+    <ol start="6">
+      <li>Click <strong>Run (▶)</strong>. Google will ask you to <strong>authorize</strong> — click through the prompts to allow it</li>
+      <li>You should see a popup that says <strong>"Setup complete! Tabs created with headers."</strong></li>
+      <li>Go back to your Google Sheet — you'll now see 4 tabs: <strong>Opening, Closing, Weekly, Prep</strong> with headers</li>
+      <li>Back in Apps Script, click <strong>Deploy → New Deployment</strong></li>
+      <li>Click the gear icon next to "Select type" and choose <strong>Web app</strong></li>
+      <li>Set <strong>"Execute as"</strong> to <strong>Me</strong></li>
+      <li>Set <strong>"Who has access"</strong> to <strong>Anyone</strong></li>
+      <li>Click <strong>Deploy</strong> and authorize again if prompted</li>
+      <li>Copy the <strong>Web App URL</strong> it gives you</li>
+      <li>Open <strong>index.html</strong> in a text editor, find <strong>SHEETS_URL</strong>, and paste the URL between the quotes</li>
+    </ol>
+
+    <div class="tip"><strong>Important:</strong> If you ever update the Apps Script code, you must create a <strong>New Deployment</strong> (not just save) for changes to take effect.</div>
+
+    <h3>External Links</h3>
+    <ul>
+      <li><strong>Guthries Ops Hub</strong> — Opens the main Guthrie's operations hub in a new tab</li>
+      <li><strong>First Choice Facilities</strong> — Opens the First Choice Facilities hub in a new tab</li>
+    </ul>
+
+    <h3>Troubleshooting</h3>
+    <ul>
+      <li><strong>Checkboxes not saving?</strong> — Make sure you're not in a private/incognito browser window. localStorage doesn't persist there.</li>
+      <li><strong>Submit not working?</strong> — Make sure the Google Apps Script URL is pasted correctly in index.html and the deployment is set to "Anyone" access.</li>
+      <li><strong>Headers missing in Google Sheet?</strong> — Run the <strong>setupSheets</strong> function again from Apps Script.</li>
+      <li><strong>Data not appearing after submit?</strong> — Check that the tab names in Google Sheets match exactly: Opening, Closing, Weekly, Prep (case-sensitive).</li>
+    </ul>
+
+  </div>
+</div>
+
+<script>
+  const STORAGE_PREFIX = 'collierville-hub-';
+  const TEAM = ['Keon', 'Sharon', 'Haley', 'Trey'];
+
+  // ── Inject assign dropdowns into every checklist item ──
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    const cb = item.querySelector('input[type="checkbox"]');
+    if (!cb) return;
+    const sel = document.createElement('select');
+    sel.className = 'assign-select';
+    sel.dataset.assignFor = cb.id;
+    sel.innerHTML = '<option value="">Done by</option>' +
+      TEAM.map(n => '<option value="' + n + '">' + n + '</option>').join('');
+    item.appendChild(sel);
+  });
+
+  // ── Section Navigation ──
+  function showSection(id, btn) {
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('visible'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('section-' + id);
+    if (panel) panel.classList.add('visible');
+    if (btn) btn.classList.add('active');
+    updateProgress(id);
+  }
+
+  // ── Progress Tracking ──
+  function updateProgress(sectionId) {
+    const panel = document.getElementById('section-' + sectionId);
+    if (!panel) return;
+    const boxes = panel.querySelectorAll('input[type="checkbox"]');
+    if (boxes.length === 0) return;
+    const checked = panel.querySelectorAll('input[type="checkbox"]:checked').length;
+    const pct = Math.round((checked / boxes.length) * 100);
+    const bar = document.getElementById('progress-' + sectionId);
+    const text = document.getElementById('progress-text-' + sectionId);
+    if (bar) bar.style.width = pct + '%';
+    if (text) text.textContent = checked + ' / ' + boxes.length + ' complete';
+  }
+
+  // ── Save / Load State ──
+  function getTodayKey() {
+    return new Date().toLocaleDateString('en-US');
+  }
+
+  function saveState() {
+    const state = {};
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      state[cb.id] = cb.checked;
+    });
+    document.querySelectorAll('.assign-select').forEach(sel => {
+      state['assign-' + sel.dataset.assignFor] = sel.value;
+    });
+    document.querySelectorAll('.data-table input[type="text"]').forEach(inp => {
+      if (inp.dataset.key) state[inp.dataset.key] = inp.value;
+    });
+    state._savedDate = getTodayKey();
+    localStorage.setItem(STORAGE_PREFIX + 'state', JSON.stringify(state));
+  }
+
+  function loadState() {
+    const raw = localStorage.getItem(STORAGE_PREFIX + 'state');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+
+    // Auto-reset if saved data is from a previous day
+    if (state._savedDate && state._savedDate !== getTodayKey()) {
+      localStorage.removeItem(STORAGE_PREFIX + 'state');
+      clearAllSections();
+      return;
+    }
+
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      if (state[cb.id] !== undefined) {
+        cb.checked = state[cb.id];
+        cb.closest('.checklist-item')?.classList.toggle('checked', cb.checked);
+      }
+    });
+    document.querySelectorAll('.assign-select').forEach(sel => {
+      const key = 'assign-' + sel.dataset.assignFor;
+      if (state[key] !== undefined) sel.value = state[key];
+    });
+    document.querySelectorAll('.data-table input[type="text"]').forEach(inp => {
+      if (inp.dataset.key && state[inp.dataset.key] !== undefined) {
+        inp.value = state[inp.dataset.key];
+      }
+    });
+  }
+
+  // Clear all 4 sections at once (used by daily auto-reset)
+  function clearAllSections() {
+    ['opening', 'closing', 'weekly', 'prep'].forEach(id => {
+      const panel = document.getElementById('section-' + id);
+      if (!panel) return;
+      panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+        cb.closest('.checklist-item')?.classList.remove('checked');
+      });
+      panel.querySelectorAll('.assign-select').forEach(sel => { sel.value = ''; });
+      panel.querySelectorAll('input[type="text"]').forEach(inp => { inp.value = ''; });
+      updateProgress(id);
+    });
+    calcPrep();
+    saveState();
+  }
+
+  // Schedule auto-reset at midnight if the app stays open overnight
+  function scheduleMidnightReset() {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setDate(midnight.getDate() + 1);
+    midnight.setHours(0, 0, 0, 0);
+    const msUntilMidnight = midnight - now;
+
+    setTimeout(() => {
+      clearAllSections();
+      // Update date display
+      const newDateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.querySelectorAll('[id^="date-"]').forEach(el => { el.textContent = newDateStr; });
+      // Schedule the next midnight reset
+      scheduleMidnightReset();
+    }, msUntilMidnight);
+  }
+
+  // ── Reset Section ──
+  function clearSection(sectionId) {
+    const panel = document.getElementById('section-' + sectionId);
+    panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.checklist-item')?.classList.remove('checked');
+    });
+    panel.querySelectorAll('.assign-select').forEach(sel => { sel.value = ''; });
+    panel.querySelectorAll('input[type="text"]').forEach(inp => { inp.value = ''; });
+    updateProgress(sectionId);
+    calcPrep();
+    saveState();
+  }
+
+  function resetSection(sectionId) {
+    if (!confirm('Reset all items in this section?')) return;
+    clearSection(sectionId);
+    flashSave(sectionId);
+  }
+
+  function flashSave(sectionId) {
+    const el = document.getElementById('save-notice-' + sectionId);
+    if (!el) return;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1500);
+  }
+
+  // ── Event Listeners ──
+  document.addEventListener('change', e => {
+    if (e.target.matches('input[type="checkbox"]')) {
+      e.target.closest('.checklist-item')?.classList.toggle('checked', e.target.checked);
+      const panel = e.target.closest('.section-panel');
+      if (panel) {
+        const sectionId = panel.id.replace('section-', '');
+        updateProgress(sectionId);
+        flashSave(sectionId);
+      }
+      saveState();
+    }
+    if (e.target.matches('.assign-select')) {
+      saveState();
+      const panel = e.target.closest('.section-panel');
+      if (panel) flashSave(panel.id.replace('section-', ''));
+    }
+  });
+
+  // ── Prep auto-calc: Par - On Hand ──
+  function calcPrep() {
+    for (let i = 0; i <= 10; i++) {
+      const input = document.querySelector('[data-key="prep-hand-' + i + '"]');
+      const cell = document.getElementById('prep-calc-' + i);
+      if (!input || !cell) continue;
+      const onHand = parseFloat(input.value);
+      const par = parseFloat(input.closest('tr').querySelector('[data-par]').dataset.par);
+      if (isNaN(onHand) || input.value.trim() === '') {
+        cell.textContent = '—';
+        cell.classList.remove('zero');
+      } else {
+        const need = Math.max(0, par - onHand);
+        cell.textContent = need;
+        cell.classList.toggle('zero', need === 0);
+      }
+    }
+  }
+
+  document.addEventListener('input', e => {
+    if (e.target.matches('.data-table input')) {
+      calcPrep();
+      saveState();
+      const panel = e.target.closest('.section-panel');
+      if (panel) flashSave(panel.id.replace('section-', ''));
+    }
+  });
+
+  // ── Date Display ──
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.querySelectorAll('[id^="date-"]').forEach(el => { el.textContent = dateStr; });
+
+  // ── Google Sheets Integration ──
+  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyYbte6GtoOcwoRujvlMNIOGHH_GW6dXOMdF91J5KXfYcB1LeiqZZhePWyZJW8LHN_0BQ/exec';
+
+  function collectSectionData(sectionId) {
+    const panel = document.getElementById('section-' + sectionId);
+    if (!panel) return null;
+    const tasks = [];
+    panel.querySelectorAll('.checklist-item').forEach(item => {
+      const cb = item.querySelector('input[type="checkbox"]');
+      const label = item.querySelector('label');
+      const sel = item.querySelector('.assign-select');
+      if (cb && label) {
+        tasks.push({
+          task: label.textContent,
+          completed: cb.checked,
+          completedBy: sel ? sel.value : ''
+        });
+      }
+    });
+    // For prep sheet, also collect table data
+    const prepData = [];
+    if (sectionId === 'prep') {
+      panel.querySelectorAll('#prep-table tbody tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const input = row.querySelector('input[type="text"]');
+        const calcCell = row.querySelector('.prep-calc');
+        prepData.push({
+          item: cells[0]?.textContent || '',
+          par: cells[1]?.textContent || '',
+          onHand: input?.value || '',
+          prep: calcCell?.textContent || ''
+        });
+      });
+    }
+    return {
+      date: today.toLocaleDateString('en-US'),
+      sheet: sectionId.charAt(0).toUpperCase() + sectionId.slice(1),
+      tasks: tasks,
+      prepData: prepData,
+      totalTasks: tasks.length,
+      completedTasks: tasks.filter(t => t.completed).length
+    };
+  }
+
+  function submitToSheets(sectionId) {
+    if (SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+      alert('Google Sheets not connected yet.\n\nFollow the setup instructions:\n1. Open Google Sheets → Extensions → Apps Script\n2. Paste the provided script\n3. Deploy as Web App\n4. Paste the URL into the SHEETS_URL variable in index.html');
+      return;
+    }
+    const btn = event.target.closest('.submit-btn');
+    const status = document.getElementById('submit-status-' + sectionId);
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    const data = collectSectionData(sectionId);
+    fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(() => {
+      btn.disabled = false;
+      btn.innerHTML = '&#9989; Submit to Google Sheets';
+      status.textContent = 'Submitted! List has been reset.';
+      status.className = 'submit-status show';
+      clearSection(sectionId);
+      setTimeout(() => { status.className = 'submit-status'; }, 3000);
+    }).catch(err => {
+      btn.disabled = false;
+      btn.innerHTML = '&#9989; Submit to Google Sheets';
+      status.textContent = 'Error — check console';
+      status.className = 'submit-status show error';
+      console.error('Submit error:', err);
+      setTimeout(() => { status.className = 'submit-status'; }, 4000);
+    });
+  }
+
+  // ── Init ──
+  loadState();
+  calcPrep();
+  scheduleMidnightReset();
+</script>
+</body>
+</html>
