@@ -54,6 +54,12 @@
     /* ── Section Panel ── */
     .section-panel { display: none; max-width: 1100px; margin: 0 auto 40px; padding: 0 16px; }
     .section-panel.visible { display: block; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 5px; font-size: 13px;
+      color: #94a3b8; cursor: pointer; background: none; border: none;
+      font-weight: 600; margin-bottom: 10px; padding: 0; transition: color 0.2s;
+    }
+    .back-link:hover { color: #c8102e; }
     .section-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #fff; }
     .section-subtitle { font-size: 13px; color: #64748b; margin-bottom: 16px; }
     .section-date {
@@ -396,6 +402,7 @@
 
 <!-- ═══════════ OPENING / CLOSING (Tabbed) ═══════════ -->
 <div id="section-checklist" class="section-panel">
+  <button class="back-link" onclick="goHome()">&larr; Back to Dashboard</button>
 
   <!-- Tab Bar -->
   <div class="tab-bar">
@@ -623,6 +630,7 @@
 
 <!-- ═══════════ WEEKLY CLEANING ═══════════ -->
 <div id="section-weekly" class="section-panel">
+  <button class="back-link" onclick="goHome()">&larr; Back to Dashboard</button>
   <h2 class="section-title">Weekly Cleaning Schedule</h2>
 
   <div id="session-start-weekly" class="session-start">
@@ -711,6 +719,7 @@
 
 <!-- ═══════════ PREP SHEET ═══════════ -->
 <div id="section-prep" class="section-panel">
+  <button class="back-link" onclick="goHome()">&larr; Back to Dashboard</button>
   <h2 class="section-title">Prep Sheet</h2>
 
   <div id="session-start-prep" class="session-start">
@@ -821,6 +830,7 @@
 
 <!-- ═══════════ HOW-TO GUIDE ═══════════ -->
 <div id="section-howto" class="section-panel">
+  <button class="back-link" onclick="goHome()">&larr; Back to Dashboard</button>
   <h2 class="section-title">How-To Guide</h2>
   <div class="section-subtitle">Everything you need to know about using the Collierville Operations Hub</div>
 
