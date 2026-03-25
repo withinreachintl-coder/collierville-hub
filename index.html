@@ -362,7 +362,7 @@
 </head>
 <body>
 
-<header class="hub-header">
+<header class="hub-header" onclick="goHome()" style="cursor:pointer;">
   <div class="hub-logo">
     <div class="hub-logo-icon"><span>G</span></div>
     <div class="hub-logo-brand">Guthrie's</div>
@@ -382,9 +382,6 @@
   </button>
   <button class="nav-btn" data-section="prep" onclick="showSection('prep', this)">
     <span class="icon">&#127860;</span> Prep Sheet
-  </button>
-  <button class="nav-btn" data-section="dashboard" onclick="showSection('dashboard', this)">
-    <span class="icon">&#128202;</span> Dashboard
   </button>
   <button class="nav-btn" data-section="howto" onclick="showSection('howto', this)">
     <span class="icon">&#128214;</span> How-To Guide
@@ -772,7 +769,7 @@
 </div>
 
 <!-- ═══════════ MANAGER DASHBOARD ═══════════ -->
-<div id="section-dashboard" class="section-panel">
+<div id="section-dashboard" class="section-panel visible">
   <h2 class="section-title">Manager Dashboard</h2>
   <div class="section-subtitle">Real-time operations overview &mdash; <span id="dash-date"></span></div>
 
@@ -1272,6 +1269,13 @@ function showSection(id, btn) {
   }
 }
 
+function goHome() {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn[data-section]').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-dashboard').classList.add('visible');
+  refreshDashboard();
+}
+
 // ══════════ TAB SWITCHING ══════════
 function switchTab(tabId, btn) {
   document.querySelectorAll('#section-checklist .tab-btn').forEach(b => b.classList.remove('active'));
@@ -1614,6 +1618,9 @@ function scheduleMidnightReset() {
 
   // Schedule midnight reset
   scheduleMidnightReset();
+
+  // Refresh dashboard on load (it's the landing page)
+  refreshDashboard();
 })();
 </script>
 </body>
