@@ -1420,14 +1420,18 @@ function submitToSheets(sectionId) {
 
   // Add to history
   const data = collectSectionData(sectionId);
-  appState.history.push({
+  const historyEntry = {
     date: data.date,
     type: data.sheet,
     completedBy: data.completedBy,
     progress: data.completedTasks + '/' + data.totalTasks,
     status: data.completedTasks === data.totalTasks ? 'Complete' : 'Incomplete',
     completedAt: new Date().toISOString()
-  });
+  };
+  if (sectionId === 'prep' && data.prepData) {
+    historyEntry.prepData = data.prepData;
+  }
+  appState.history.push(historyEntry);
   if (appState.history.length > 30) appState.history = appState.history.slice(-30);
   saveState();
 
@@ -1441,11 +1445,13 @@ function submitToSheets(sectionId) {
     btn.innerHTML = '&#9989; Submit to Google Sheets';
     showActionStatus(sectionId, 'Submitted successfully!', false);
     clearSection(sectionId);
+    refreshDashboard();
   }).catch(err => {
     btn.disabled = false;
     btn.innerHTML = '&#9989; Submit to Google Sheets';
     showActionStatus(sectionId, 'Error — check console', true);
     console.error('Submit error:', err);
+    refreshDashboard();
   });
 }
 
@@ -1459,6 +1465,7 @@ function refreshDashboard() {
   ];
 
   let totalTasks = 0, totalDone = 0, totalPhotos = 0;
+  const todayDateStr = new Date().toLocaleDateString('en-US');
 
   // Live Status
   let liveHtml = '';
@@ -1471,6 +1478,15 @@ function refreshDashboard() {
       for (let i = 0; i <= 10; i++) {
         const inp = document.querySelector('[data-key="prep-hand-' + i + '"]');
         if (inp && inp.value.trim() !== '') done++;
+      }
+      // If no live data, check if prep was already submitted today
+      if (done === 0) {
+        const todayPrep = appState.history.slice().reverse().find(h => h.type === 'Prep' && h.date === todayDateStr);
+        if (todayPrep) {
+          const parts = todayPrep.progress.split('/');
+          done = parseInt(parts[0]) || 0;
+          total = parseInt(parts[1]) || 11;
+        }
       }
     } else {
       const bodyEl = document.getElementById('checklist-body-' + sec.id);
@@ -1490,18 +1506,29 @@ function refreshDashboard() {
     totalPhotos += photos;
 
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    let status, statusClass;
-    if (!session) { status = 'Not Started'; statusClass = 'not-started'; }
-    else if (done === total && total > 0) { status = 'Complete'; statusClass = 'complete'; }
-    else { status = 'In Progress'; statusClass = 'in-progress'; }
+    let status, statusClass, submittedBy = '';
+    // Check if this section was already submitted today
+    const typeMap = { opening: 'Opening', closing: 'Closing', weekly: 'Weekly', prep: 'Prep' };
+    const submitted = appState.history.slice().reverse().find(h => h.type === typeMap[sec.id] && h.date === todayDateStr);
+
+    if (!session && submitted) {
+      status = 'Submitted'; statusClass = 'complete'; submittedBy = submitted.completedBy || '';
+    } else if (!session) {
+      status = 'Not Started'; statusClass = 'not-started';
+    } else if (done === total && total > 0) {
+      status = 'Complete'; statusClass = 'complete';
+    } else {
+      status = 'In Progress'; statusClass = 'in-progress';
+    }
 
     const barColor = pct >= 80 ? '#22c55e' : pct >= 40 ? '#eab308' : '#ef4444';
     const navTarget = sec.id === 'opening' || sec.id === 'closing' ? 'checklist' : sec.id;
+    const whoLabel = session ? session.startedBy : submittedBy;
 
     liveHtml += '<div class="live-status-card">' +
       '<div class="ls-name">' + sec.icon + ' ' + sec.label + '</div>' +
       '<span class="ls-badge ' + statusClass + '">' + status + '</span>' +
-      (session ? '<span class="ls-who">' + session.startedBy + '</span>' : '') +
+      (whoLabel ? '<span class="ls-who">' + whoLabel + '</span>' : '') +
       '<div class="ls-bar-wrap"><div class="ls-mini-bar"><div class="ls-mini-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
       '<span class="ls-pct">' + done + '/' + total + '</span></div>' +
       '<button class="ls-view" onclick="showSection(\'' + navTarget + '\', document.querySelector(\'[data-section=' + navTarget + ']\'))">View</button>' +
@@ -1531,10 +1558,25 @@ function refreshDashboard() {
         if (data && data.photo) photoCount++;
       });
     }
+    // Check if submitted today
+    const snapSubmitted = appState.history.slice().reverse().find(h => h.type === label && h.date === todayDateStr);
+    let snapStatus, snapWho;
+    if (session) {
+      snapStatus = done === total && total > 0 ? 'Complete' : 'In Progress';
+      snapWho = session.startedBy;
+    } else if (snapSubmitted) {
+      snapStatus = 'Submitted';
+      snapWho = snapSubmitted.completedBy;
+      const parts = snapSubmitted.progress.split('/');
+      done = parseInt(parts[0]) || 0;
+      total = parseInt(parts[1]) || total;
+    } else {
+      snapStatus = 'Not Started';
+      snapWho = '—';
+    }
     snapHtml += '<div class="snapshot-card"><h4>' + label + ' Checklist</h4>';
-    snapHtml += '<div class="snap-item"><span>Status</span><span class="snap-value">' +
-      (session ? (done === total && total > 0 ? 'Complete' : 'In Progress') : 'Not Started') + '</span></div>';
-    snapHtml += '<div class="snap-item"><span>Completed By</span><span class="snap-value">' + (session ? session.startedBy : '—') + '</span></div>';
+    snapHtml += '<div class="snap-item"><span>Status</span><span class="snap-value">' + snapStatus + '</span></div>';
+    snapHtml += '<div class="snap-item"><span>Completed By</span><span class="snap-value">' + (snapWho || '—') + '</span></div>';
     snapHtml += '<div class="snap-item"><span>Progress</span><span class="snap-value">' + done + '/' + total + '</span></div>';
     snapHtml += '<div class="snap-item"><span>Photos</span><span class="snap-value">' + photoCount + '</span></div>';
     snapHtml += '</div>';
@@ -1569,7 +1611,20 @@ function refreshDashboard() {
       prepHtml += '<div class="snap-item"><span>' + itemName + '</span><span class="snap-value">Need: ' + need + '</span></div>';
     }
   }
-  if (prepFilled === 0) prepHtml = '<div style="color:#64748b;font-size:12px;">No prep data entered yet</div>';
+  if (prepFilled === 0) {
+    // Show last submitted prep data from history
+    const lastPrep = appState.history.slice().reverse().find(h => h.type === 'Prep' && h.prepData);
+    if (lastPrep) {
+      prepHtml = '<div style="color:#64748b;font-size:11px;margin-bottom:6px;">Last submitted by ' + (lastPrep.completedBy || '—') + ' at ' + new Date(lastPrep.completedAt).toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'}) + '</div>';
+      lastPrep.prepData.forEach(row => {
+        if (row.onHand.trim() !== '') {
+          prepHtml += '<div class="snap-item"><span>' + row.item + '</span><span class="snap-value">On Hand: ' + row.onHand + ' | Need: ' + row.prep + '</span></div>';
+        }
+      });
+    } else {
+      prepHtml = '<div style="color:#64748b;font-size:12px;">No prep data entered yet</div>';
+    }
+  }
   document.getElementById('dash-prep-items').innerHTML = prepHtml;
 
   const weeklyBody = document.getElementById('checklist-body-weekly');
@@ -1581,9 +1636,20 @@ function refreshDashboard() {
     });
   }
   const weeklySession = appState.sessions.weekly;
+  let weeklyWho = weeklySession ? weeklySession.startedBy : '—';
+  // If cleared after submit, check history
+  if (!weeklySession && weeklyDone === 0) {
+    const weeklySubmitted = appState.history.slice().reverse().find(h => h.type === 'Weekly' && h.date === todayDateStr);
+    if (weeklySubmitted) {
+      const parts = weeklySubmitted.progress.split('/');
+      weeklyDone = parseInt(parts[0]) || 0;
+      weeklyTotal = parseInt(parts[1]) || weeklyTotal;
+      weeklyWho = weeklySubmitted.completedBy || '—';
+    }
+  }
   document.getElementById('dash-cleaning-items').innerHTML =
     '<div class="snap-item"><span>Completed</span><span class="snap-value">' + weeklyDone + '/' + weeklyTotal + '</span></div>' +
-    '<div class="snap-item"><span>By</span><span class="snap-value">' + (weeklySession ? weeklySession.startedBy : '—') + '</span></div>' +
+    '<div class="snap-item"><span>By</span><span class="snap-value">' + weeklyWho + '</span></div>' +
     '<div class="snap-item"><span>Progress</span><span class="snap-value">' + (weeklyTotal > 0 ? Math.round((weeklyDone / weeklyTotal) * 100) : 0) + '%</span></div>';
 
   document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
